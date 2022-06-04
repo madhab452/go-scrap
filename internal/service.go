@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -67,6 +68,10 @@ func New(ctx context.Context, log *logrus.Entry, conf *Conf) (*Service, error) {
 
 	var w Writer
 	if conf.TARGET != "" {
+		if !strings.HasPrefix(conf.TARGET, "http") {
+			return nil, fmt.Errorf("target must be a valid url, %v given", conf.TARGET)
+		}
+
 		var err error
 		w, err = tcpwriter.New(ctx, log, conf.TARGET)
 		if err != nil {

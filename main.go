@@ -11,6 +11,8 @@ import (
 var log *logrus.Entry
 
 func main() {
+	log = logrus.NewEntry(logrus.New())
+
 	conf := internal.Conf{
 		PROVIDER: os.Getenv("PROVIDER"),
 		SRC:      os.Getenv("SRC"),
@@ -19,10 +21,14 @@ func main() {
 
 	s, err := internal.New(context.Background(), log, &conf)
 	if err != nil {
-		log.WithError(err).Error("internal.New()")
+		log.WithError(err).Printf("internal.New()")
+		return
 	}
 
 	if err := s.ReadAndWrite(); err != nil {
-		log.WithError(err).Error("s.ReadAndWrite()")
+		log.WithError(err).Printf("s.ReadAndWrite()")
+		return
 	}
+
+	log.Printf("successfully scrapped the data")
 }
