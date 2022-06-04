@@ -1,4 +1,9 @@
 linters-settings:
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - disableStutteringCheck
   depguard:
     list-type: blacklist
     packages:
@@ -46,7 +51,6 @@ linters-settings:
       - '3'
     ignored-functions:
       - strings.SplitN
-
   govet:
     check-shadowing: true
     settings:
@@ -103,6 +107,7 @@ linters:
     - unused
     - varcheck
     - whitespace
+    - revive
 
   # don't enable:
   # - asciicheck
@@ -133,7 +138,10 @@ issues:
       text: "SA1019: lsc.Errcheck.Exclude is deprecated: use ExcludeFunctions instead"
     - path: pkg/commands/run.go
       text: "SA1019: e.cfg.Run.Deadline is deprecated: Deadline exists for historical compatibility and should not be used."
-
+      
+  include:
+    - EXC0012  # EXC0012 revive: Annoying issue about not having a comment. The rare codebase has such comments
+    - EXC0014  # EXC0014 revive: Annoying issue about not having a comment. The rare codebase has such comments
 run:
   timeout: 5m
   go: '1.17' # TODO(ldez): we force to use an old version of Go for the CI and the tests.
