@@ -20,11 +20,13 @@ type Conf struct {
 
 // Reader defines contract that should be abide by Reader. eg local file, remotehost, stdin (not implemented)
 type Reader interface {
+	// Read reads and return slice of colly.Row
 	Read() ([]*colly.Row, error)
 }
 
-// Writer defines contract that should be abide by Writer. eg stdout, tcp
+// Writer defines contract that should be abide by Writer. eg stdout, tcp.
 type Writer interface {
+	// Write writes to the destination.
 	Write([]*colly.Row) error
 }
 
@@ -45,8 +47,9 @@ func (s *Service) ReadAndWrite() error {
 	}
 
 	if err := s.writer.Write(rows); err != nil {
-		return fmt.Errorf("s.writer.Write: %w", err)
+		return fmt.Errorf("s.writer.Write(): %w", err)
 	}
+
 	return nil
 }
 
@@ -84,5 +87,6 @@ func New(ctx context.Context, log *logrus.Entry, conf *Conf) (*Service, error) {
 		conf:   conf,
 		writer: w,
 	}
+
 	return svc, nil
 }

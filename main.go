@@ -2,14 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/madhab452/go-scrap/internal"
 	"github.com/sirupsen/logrus"
 )
 
-var log logrus.Entry
+var log *logrus.Entry
 
 func main() {
 	conf := internal.Conf{
@@ -18,12 +17,12 @@ func main() {
 		TARGET:   os.Getenv("TARGET"),
 	}
 
-	s, err := internal.New(context.Background(), &log, &conf)
+	s, err := internal.New(context.Background(), log, &conf)
 	if err != nil {
-		log.Panic(err)
+		log.WithError(err).Error("internal.New()")
 	}
 
 	if err := s.ReadAndWrite(); err != nil {
-		fmt.Println(err)
+		log.WithError(err).Error("s.ReadAndWrite()")
 	}
 }
