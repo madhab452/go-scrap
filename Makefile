@@ -1,7 +1,6 @@
 # PROVIDER data provider
 export PROVIDER=nepse
 
-# FILE_PATH must be provided in case you want to read from local file
 export SRC=_examples/nepse/nepse_1.html
 # export SRC=http://www.nepalstock.com/main/todays_price/index/1/?startDate=&stock-symbol=&_limit=500
 
