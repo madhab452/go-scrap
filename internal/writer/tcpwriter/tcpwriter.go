@@ -14,21 +14,23 @@ import (
 	"github.com/madhab452/go-scrap/internal/colly"
 )
 
+// TCPWriter holds target url and behavior to send POST request to that remote url.
 type TCPWriter struct {
 	ctx       context.Context
 	log       *logrus.Entry
 	targetURL string
 }
 
+// Write posts to some remote location: targetURL
 func (tw *TCPWriter) Write(rows []*colly.Row) error {
 	for i := 1; i < len(rows); i++ {
 		r := rows[i]
-		json_data, err := json.Marshal(r)
+		jsonData, err := json.Marshal(r)
 		if err != nil {
 			return fmt.Errorf("json.Marshal(): %w", err)
 		}
 
-		resp, err := http.Post(tw.targetURL, "application/json", strings.NewReader(string(json_data)))
+		resp, err := http.Post(tw.targetURL, "application/json", strings.NewReader(string(jsonData)))
 		if err != nil {
 			return fmt.Errorf("http.Post(): %w", err)
 		}
@@ -41,6 +43,7 @@ func (tw *TCPWriter) Write(rows []*colly.Row) error {
 	return nil
 }
 
+// New returns an instance of TCPWriter
 func New(ctx context.Context, log *logrus.Entry, targetURL string) (*TCPWriter, error) {
 	return &TCPWriter{
 		ctx:       ctx,
