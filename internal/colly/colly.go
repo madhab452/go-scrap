@@ -11,11 +11,11 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
+// ReaderOpt reader options to
 type ReaderOpt struct {
-	PROVIDER  string
-	DSRC      string
-	URL       string
-	FILE_PATH string
+	PROVIDER string
+	SRC      string
+	TARGET   string
 }
 
 type Colly struct {
@@ -90,10 +90,12 @@ func mapPosition(row Row, x int, data string) Row {
 }
 
 func (co *Colly) Read() ([]Row, error) {
-	var target string
 	c := colly.NewCollector()
-	if co.opt.DSRC == "FILE" {
-		filepath, err := filepath.Abs(co.opt.FILE_PATH)
+
+	var dsrc string
+
+	if !strings.HasPrefix(co.opt.SRC, "http") { // file source
+		filepath, err := filepath.Abs(co.opt.SRC)
 		if err != nil {
 			return nil, fmt.Errorf("filepath.Abs(): %w", err)
 		}
@@ -101,12 +103,9 @@ func (co *Colly) Read() ([]Row, error) {
 		t.RegisterProtocol("file", http.NewFileTransport(http.Dir("/")))
 
 		c.WithTransport(t)
-		target = "file://" + filepath
-
-	} else if co.opt.DSRC == "INTERNET" {
-		target = co.opt.URL
+		dsrc = "file://" + filepath
 	} else {
-		target = ""
+		dsrc = co.opt.SRC
 	}
 
 	var result []Row
@@ -124,9 +123,10 @@ func (co *Colly) Read() ([]Row, error) {
 			}
 		})
 	})
-	err := c.Visit(target)
+
+	err := c.Visit(dsrc)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("c.Visit(%v): %w", dsrc, err)
 	}
 
 	return result, nil
