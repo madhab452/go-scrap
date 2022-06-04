@@ -15,10 +15,11 @@ func main() {
 	conf := internal.Conf{
 		PROVIDER:   os.Getenv("PROVIDER"),
 		DSRC:       os.Getenv("DSRC"),
-		URL:        os.Getenv("SOURCE"),
+		URL:        os.Getenv("URL"),
 		FILE_PATH:  os.Getenv("FILE_PATH"),
 		TARGET_URL: os.Getenv("TARGET_URL"),
 	}
+
 	s, err := internal.New(context.Background(), &log, &conf)
 	if err != nil {
 		log.Panic(err)

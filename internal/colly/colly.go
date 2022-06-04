@@ -1,13 +1,14 @@
 package colly
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gocolly/colly"
+	"github.com/gocolly/colly/v2"
 )
 
 type ReaderOpt struct {
@@ -18,10 +19,10 @@ type ReaderOpt struct {
 }
 
 type Colly struct {
-	opt *ReaderOpt
+	opt ReaderOpt
 }
 
-func NewColly(opt *ReaderOpt) (*Colly, error) {
+func NewColly(opt ReaderOpt) (*Colly, error) {
 	return &Colly{
 		opt: opt,
 	}, nil
@@ -89,21 +90,23 @@ func mapPosition(row Row, x int, data string) Row {
 }
 
 func (co *Colly) Read() ([]Row, error) {
-	var target = ""
+	var target string
 	c := colly.NewCollector()
-
-	if co.opt.DSRC == "file" {
+	if co.opt.DSRC == "FILE" {
 		filepath, err := filepath.Abs(co.opt.FILE_PATH)
 		if err != nil {
-			panic(err)
+			return nil, fmt.Errorf("filepath.Abs(): %w", err)
 		}
 		t := &http.Transport{}
 		t.RegisterProtocol("file", http.NewFileTransport(http.Dir("/")))
 
 		c.WithTransport(t)
 		target = "file://" + filepath
-	} else {
+
+	} else if co.opt.DSRC == "INTERNET" {
 		target = co.opt.URL
+	} else {
+		target = ""
 	}
 
 	var result []Row
@@ -121,10 +124,10 @@ func (co *Colly) Read() ([]Row, error) {
 			}
 		})
 	})
-
 	err := c.Visit(target)
 	if err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
