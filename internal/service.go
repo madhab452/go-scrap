@@ -13,11 +13,9 @@ import (
 
 // Conf represents configuration options for scrapper
 type Conf struct {
-	PROVIDER   string
-	DSRC       string
-	URL        string
-	FILE_PATH  string
-	TARGET_URL string
+	PROVIDER string
+	SRC      string
+	TARGET   string
 }
 type Reader interface {
 	Read() ([]colly.Row, error)
@@ -49,26 +47,19 @@ func (s *Service) ReadAndWrite() error {
 // New creates an instance of Service
 func New(ctx context.Context, log *logrus.Entry, conf *Conf) (*Service, error) {
 	opt := colly.ReaderOpt{
-		PROVIDER:  conf.PROVIDER,
-		DSRC:      conf.DSRC,
-		URL:       conf.URL,
-		FILE_PATH: conf.FILE_PATH,
+		PROVIDER: conf.PROVIDER,
+		SRC:      conf.SRC,
+		TARGET:   conf.TARGET,
 	}
 
-	if conf.DSRC == "" {
-		return nil, fmt.Errorf("required env var DSRC is missing")
-	} else {
-		if conf.DSRC == "INTERNET" && conf.URL == "" {
-			return nil, fmt.Errorf("remote url for data source is missing")
-		} else if conf.DSRC == "FILE" && conf.FILE_PATH == "" {
-			return nil, fmt.Errorf("file path to read the data is missing")
-		}
+	if conf.SRC == "" {
+		return nil, fmt.Errorf("required env var SRC missing")
 	}
 
 	var w Writer
-	if conf.TARGET_URL != "" {
+	if conf.TARGET != "" {
 		var err error
-		w, err = tcpwriter.New(ctx, log, conf.TARGET_URL)
+		w, err = tcpwriter.New(ctx, log, conf.TARGET)
 		if err != nil {
 			return nil, fmt.Errorf("tcpwriter.New(): %w", err)
 		}

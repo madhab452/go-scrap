@@ -1,14 +1,13 @@
 # PROVIDER data provider
 export PROVIDER=nepse
 
-# enum FILE, or INTERNET, DSRC=FILE, FILE_PATH is required. if DSRC=INTERNET, URL is required
-export DSRC=FILE
-export FILE_PATH=_examples/nepse/nepse_1.html
-# export URL=http://www.nepalstock.com/main/todays_price/index/1/?startDate=&stock-symbol=&_limit=500 
+# FILE_PATH must be provided in case you want to read from local file
+export SRC=_examples/nepse/nepse_1.html
+# export SRC=http://www.nepalstock.com/main/todays_price/index/1/?startDate=&stock-symbol=&_limit=500
 
-# TARGET_URL -> the destination the scrapped data should be fed to, default is console
-# export TARGET_URL=http://127.0.0.1:4040/v1/transactions
-export TARGET_URL=
+# export TARGET=http://127.0.0.1:4040/v1/transactions
+export TARGET=
+
 
 
 .PHONY: help
