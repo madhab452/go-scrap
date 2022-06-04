@@ -18,16 +18,19 @@ type ReaderOpt struct {
 	TARGET   string
 }
 
+// Colly holds reading and read behavior
 type Colly struct {
 	opt ReaderOpt
 }
 
+// NewColly new instance of colly.
 func NewColly(opt ReaderOpt) (*Colly, error) {
 	return &Colly{
 		opt: opt,
 	}, nil
 }
 
+// Row a row of a transaction table.
 type Row struct {
 	SN              string `json:"-"`
 	TradedCompany   string `json:"company"`
@@ -41,7 +44,7 @@ type Row struct {
 	Diff            string `json:"diff"`
 }
 
-func mapPosition(row Row, x int, data string) Row {
+func mapPosition(row *Row, x int, data string) *Row {
 	if x == 0 {
 		row.SN = data
 	}
@@ -89,13 +92,13 @@ func mapPosition(row Row, x int, data string) Row {
 	return row
 }
 
-func (co *Colly) Read() ([]Row, error) {
+func (co *Colly) Read() ([]*Row, error) {
 	c := colly.NewCollector()
 
 	var dsrc string
 
 	if !strings.HasPrefix(co.opt.SRC, "http") { // file source
-		filepath, err := filepath.Abs(co.opt.SRC)
+		fp, err := filepath.Abs(co.opt.SRC)
 		if err != nil {
 			return nil, fmt.Errorf("filepath.Abs(): %w", err)
 		}
@@ -103,19 +106,18 @@ func (co *Colly) Read() ([]Row, error) {
 		t.RegisterProtocol("file", http.NewFileTransport(http.Dir("/")))
 
 		c.WithTransport(t)
-		dsrc = "file://" + filepath
+		dsrc = "file://" + fp
 	} else {
 		dsrc = co.opt.SRC
 	}
 
-	var result []Row
+	var result []*Row
 
 	c.OnHTML(`body`, func(e *colly.HTMLElement) {
 		table := e.DOM.Find("table").First()
 		table.Find("tr").Each(func(i int, tr *goquery.Selection) {
-
 			if tds := tr.Find("td"); tds.Length() == 10 {
-				row := Row{}
+				row := &Row{}
 				tr.Find("td").Each(func(j int, s *goquery.Selection) {
 					row = mapPosition(row, j, s.Text()) // inefficient. multiple copies
 				})

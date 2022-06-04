@@ -17,13 +17,18 @@ type Conf struct {
 	SRC      string
 	TARGET   string
 }
+
+// Reader defines contract that should be abide by Reader. eg local file, remotehost, stdin (not implemented)
 type Reader interface {
-	Read() ([]colly.Row, error)
-}
-type Writer interface {
-	Write([]colly.Row) error
+	Read() ([]*colly.Row, error)
 }
 
+// Writer defines contract that should be abide by Writer. eg stdout, tcp
+type Writer interface {
+	Write([]*colly.Row) error
+}
+
+// Service services Read and Writer.
 type Service struct {
 	log  *logrus.Entry
 	conf *Conf
@@ -32,6 +37,7 @@ type Service struct {
 	writer Writer
 }
 
+// ReadAndWrite ReadAndWrite
 func (s *Service) ReadAndWrite() error {
 	rows, err := s.reader.Read()
 	if err != nil {

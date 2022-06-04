@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -14,41 +14,38 @@ import (
 	"github.com/madhab452/go-scrap/internal/colly"
 )
 
-type TcpWriter struct {
+// TCPWriter holds target url and behavior to send POST request to that remote url.
+type TCPWriter struct {
 	ctx       context.Context
 	log       *logrus.Entry
 	targetURL string
 }
 
-func (tw *TcpWriter) Write(rows []colly.Row) error {
+// Write posts to some remote location: targetURL
+func (tw *TCPWriter) Write(rows []*colly.Row) error {
 	for i := 1; i < len(rows); i++ {
 		r := rows[i]
-		json_data, err := json.Marshal(r)
+		jsonData, err := json.Marshal(r)
 		if err != nil {
 			return fmt.Errorf("json.Marshal(): %w", err)
 		}
 
-		resp, err := http.Post(tw.targetURL, "application/json", strings.NewReader(string(json_data)))
+		resp, err := http.Post(tw.targetURL, "application/json", strings.NewReader(string(jsonData)))
 		if err != nil {
 			return fmt.Errorf("http.Post(): %w", err)
 		}
 		defer resp.Body.Close()
 
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
+		if _, err := io.ReadAll(resp.Body); err != nil {
 			return fmt.Errorf("ioutil.ReadAll(): %w", err)
 		}
-		fmt.Println(string(bodyBytes))
-
-		var res map[string]interface{}
-
-		json.NewDecoder(resp.Body).Decode(&res)
 	}
 	return nil
 }
 
-func New(ctx context.Context, log *logrus.Entry, targetURL string) (*TcpWriter, error) {
-	return &TcpWriter{
+// New returns an instance of TCPWriter
+func New(ctx context.Context, log *logrus.Entry, targetURL string) (*TCPWriter, error) {
+	return &TCPWriter{
 		ctx:       ctx,
 		log:       log,
 		targetURL: targetURL,
