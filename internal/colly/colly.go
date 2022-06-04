@@ -41,7 +41,7 @@ type Row struct {
 	Diff            string `json:"diff"`
 }
 
-func mapPosition(row Row, x int, data string) Row {
+func mapPosition(row *Row, x int, data string) *Row {
 	if x == 0 {
 		row.SN = data
 	}
@@ -89,7 +89,7 @@ func mapPosition(row Row, x int, data string) Row {
 	return row
 }
 
-func (co *Colly) Read() ([]Row, error) {
+func (co *Colly) Read() ([]*Row, error) {
 	c := colly.NewCollector()
 
 	var dsrc string
@@ -108,14 +108,14 @@ func (co *Colly) Read() ([]Row, error) {
 		dsrc = co.opt.SRC
 	}
 
-	var result []Row
+	var result []*Row
 
 	c.OnHTML(`body`, func(e *colly.HTMLElement) {
 		table := e.DOM.Find("table").First()
 		table.Find("tr").Each(func(i int, tr *goquery.Selection) {
 
 			if tds := tr.Find("td"); tds.Length() == 10 {
-				row := Row{}
+				row := &Row{}
 				tr.Find("td").Each(func(j int, s *goquery.Selection) {
 					row = mapPosition(row, j, s.Text()) // inefficient. multiple copies
 				})

@@ -10,7 +10,7 @@ import (
 type CWriter struct {
 }
 
-func (cw *CWriter) Write(rows []colly.Row) error {
+func (cw *CWriter) Write(rows []*colly.Row) error {
 	for _, row := range rows {
 		fmt.Println(row)
 	}

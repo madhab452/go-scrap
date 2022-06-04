@@ -20,7 +20,7 @@ type TCPWriter struct {
 	targetURL string
 }
 
-func (tw *TCPWriter) Write(rows []colly.Row) error {
+func (tw *TCPWriter) Write(rows []*colly.Row) error {
 	for i := 1; i < len(rows); i++ {
 		r := rows[i]
 		json_data, err := json.Marshal(r)

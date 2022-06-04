@@ -18,10 +18,10 @@ type Conf struct {
 	TARGET   string
 }
 type Reader interface {
-	Read() ([]colly.Row, error)
+	Read() ([]*colly.Row, error)
 }
 type Writer interface {
-	Write([]colly.Row) error
+	Write([]*colly.Row) error
 }
 
 type Service struct {
