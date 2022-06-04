@@ -23,3 +23,6 @@ help: ## Show command list
 
 run: ## Run Scrapper
 	go run main.go
+
+lint: ## Run linter
+	golangci-lint run
