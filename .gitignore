@@ -1,1 +1,7 @@
 .vscode
+
+# binary 
+.go-scrap
+
+# env var
+.env.sh

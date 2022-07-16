@@ -1,13 +1,3 @@
-# PROVIDER data provider
-export PROVIDER=nepse
-
-export SRC=_examples/nepse/nepse_1.html
-# export SRC=http://www.nepalstock.com/main/todays_price/index/1/?startDate=&stock-symbol=&_limit=500
-
-# export TARGET=http://127.0.0.1:4040/v1/transactions
-export TARGET=
-
-
 
 .PHONY: help
 
@@ -22,6 +12,7 @@ help: ## Show command list
 
 
 run: ## Run Scrapper
+	. ./.env.sh && \
 	go run main.go
 
 lint: ## Run linter
